@@ -30,30 +30,30 @@ dp = Dispatcher()
 games = {}
 scores = {}
 
-# --- TUGMALAR ---
+# --- TUGMALAR (EMOJISIZ) ---
 menu_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Men topaman 👤"), KeyboardButton(text="Bot topsin 🤖")],
-        [KeyboardButton(text="Hisob 📊"), KeyboardButton(text="Qoidalar 📜")]
+        [KeyboardButton(text="Men topaman"), KeyboardButton(text="Bot topsin")],
+        [KeyboardButton(text="Hisob"), KeyboardButton(text="Qoidalar")]
     ],
     resize_keyboard=True
 )
 
 javob_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Kattaroq ⬆️"), KeyboardButton(text="Kichikroq ⬇️")],
-        [KeyboardButton(text="Topdingiz ✅")]
+        [KeyboardButton(text="Kattaroq"), KeyboardButton(text="Kichikroq")],
+        [KeyboardButton(text="Topdingiz")]
     ],
     resize_keyboard=True
 )
 
 # --- YORDAMCHI FUNKSIYALAR ---
 def get_rank(points):
-    if points < 5: return "Yangi o'yinchi 👶"
-    elif points < 10: return "Havaskor 👦"
-    elif points < 20: return "Tajribali 😎"
-    elif points < 50: return "Professional 🎯"
-    else: return "KIBORG 🤖"
+    if points < 5: return "Yangi o'yinchi"
+    elif points < 10: return "Havaskor"
+    elif points < 20: return "Tajribali"
+    elif points < 50: return "Professional"
+    else: return "KIBORG"
 
 def get_score_text(user_id):
     if user_id not in scores: scores[user_id] = {'user': 0, 'bot': 0}
@@ -69,28 +69,27 @@ def get_score_text(user_id):
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     await message.answer(
-        "Salom! Keling, o'ynaymiz 👇\nMaqsad: 'KIBORG' unvoniga yetish!", 
+        "Salom! Keling, o'ynaymiz.\nMaqsad: 'KIBORG' unvoniga yetish!", 
         reply_markup=menu_kb
     )
 
-@dp.message(F.text == "Qoidalar 📜")
+@dp.message(F.text == "Qoidalar")
 async def show_rules(message: types.Message):
     await message.answer(
         "📜 <b>QOIDALAR:</b>\n\n"
-        "1. 👤 <b>Siz topganda:</b> 4 ta urinishda topsangiz +1 ochko.\n"
-        "2. 🤖 <b>Bot topganda:</b> Bot 4 ta urinishda topsa +1 ochko.\n\n"
-        "<i>Omad!</i>", 
+        "1. <b>Siz topganda:</b> 4 ta urinishda topsangiz +1 ochko.\n"
+        "2. <b>Bot topganda:</b> Bot 4 ta urinishda topsa +1 ochko.", 
         parse_mode="HTML", reply_markup=menu_kb
     )
 
-@dp.message(F.text.startswith("Hisob"))
+@dp.message(F.text == "Hisob")
 async def show_score(message: types.Message):
     await message.answer(get_score_text(message.from_user.id), parse_mode="HTML", reply_markup=menu_kb)
 
 # ---------------------------------------------------------
-# 1. USER TOPADI (Siz topasiz)
+# 1. USER TOPADI
 # ---------------------------------------------------------
-@dp.message(F.text.startswith("Men topaman"))
+@dp.message(F.text == "Men topaman")
 async def user_guess_mode(message: types.Message):
     user_id = message.from_user.id
     games[user_id] = {'holat': 'user_topadi', 'son': random.randint(1, 100), 'urinishlar': 0}
@@ -100,7 +99,13 @@ async def user_guess_mode(message: types.Message):
 async def process_user_guess(message: types.Message):
     user_id = message.from_user.id
     
-    if "Bot topsin" in message.text: await bot_guess_mode(message); return
+    # Generic filter
+    if message.text == "Bot topsin": await bot_guess_mode(message); return
+    
+    # Bot topish rejimidagi so'zlarni ushlab qolish
+    if message.text in ["Kattaroq", "Kichikroq", "Topdingiz"]:
+        await process_bot_guess(message)
+        return
 
     if user_id not in games:
         if message.text.isdigit(): await message.answer("O'yin faol emas. Menyudan tanlang 👇", reply_markup=menu_kb)
@@ -120,9 +125,9 @@ async def process_user_guess(message: types.Message):
     urinish = games[user_id]['urinishlar']
     
     if son < yashirin:
-        await message.answer(f"Mening sonim KATTAROQ ⬆️\n(Urinish: {urinish})")
+        await message.answer(f"Mening sonim KATTAROQ (Urinish: {urinish})")
     elif son > yashirin:
-        await message.answer(f"Mening sonim KICHIKROQ ⬇️\n(Urinish: {urinish})")
+        await message.answer(f"Mening sonim KICHIKROQ (Urinish: {urinish})")
     else:
         if urinish <= 4:
             if user_id not in scores: scores[user_id] = {'user': 0, 'bot': 0}
@@ -136,9 +141,9 @@ async def process_user_guess(message: types.Message):
         del games[user_id]
 
 # ---------------------------------------------------------
-# 2. BOT TOPADI (Bot topadi) - TUZATILGAN QISM
+# 2. BOT TOPADI
 # ---------------------------------------------------------
-@dp.message(F.text.startswith("Bot topsin"))
+@dp.message(F.text == "Bot topsin")
 async def bot_guess_mode(message: types.Message):
     user_id = message.from_user.id
     games[user_id] = {'holat': 'bot_topadi', 'min': 1, 'max': 100, 'urinishlar': 0}
@@ -155,15 +160,13 @@ async def bot_tahmin_qilish(message, user_id):
     data['tahmin'] = tahmin
     data['urinishlar'] += 1
     
-    # BU YERDA HTML ISHLATAMIZ (Markdown emas)
-    # <b> </b> - bu qalin yozuv degani
     await message.answer(
         f"Mening {data['urinishlar']}-taxminim: <b>{tahmin}</b>\nTo'g'rimi?", 
         reply_markup=javob_kb,
         parse_mode="HTML"
     )
 
-@dp.message(F.text.in_({"Kattaroq ⬆️", "Kichikroq ⬇️", "Topdingiz ✅"}))
+@dp.message(F.text.in_({"Kattaroq", "Kichikroq", "Topdingiz"}))
 async def process_bot_guess(message: types.Message):
     user_id = message.from_user.id
     if user_id not in games:
@@ -176,7 +179,7 @@ async def process_bot_guess(message: types.Message):
     javob = message.text
     data = games[user_id]
     
-    if javob == "Topdingiz ✅":
+    if javob == "Topdingiz":
         if data['urinishlar'] <= 4:
             if user_id not in scores: scores[user_id] = {'user': 0, 'bot': 0}
             scores[user_id]['bot'] += 1
@@ -188,12 +191,12 @@ async def process_bot_guess(message: types.Message):
         await message.answer(get_score_text(user_id), parse_mode="HTML")
         del games[user_id]
         
-    elif javob == "Kattaroq ⬆️":
+    elif javob == "Kattaroq":
         data['min'] = data['tahmin'] + 1
         if data['min'] > data['max']: await message.answer("Aldamang! 🤔", reply_markup=menu_kb); del games[user_id]
         else: await bot_tahmin_qilish(message, user_id)
             
-    elif javob == "Kichikroq ⬇️":
+    elif javob == "Kichikroq":
         data['max'] = data['tahmin'] - 1
         if data['min'] > data['max']: await message.answer("Aldamang! 🤔", reply_markup=menu_kb); del games[user_id]
         else: await bot_tahmin_qilish(message, user_id)
