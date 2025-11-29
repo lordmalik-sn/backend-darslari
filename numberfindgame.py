@@ -11,7 +11,7 @@ from aiohttp import web # Render uchun web server
 
 # ---------------------------------------------------
 # TOKENINGIZNI SHU YERGA QO'YING (Qo'shtirnoq ichida)
-API_TOKEN = 'TOKEN_BU_YERGA'
+API_TOKEN = '5688843517:AAEfwhH7PDQeqm2b_dcbh5cAWyl00F3QkvQ'
 # ---------------------------------------------------
 
 logging.basicConfig(level=logging.INFO)
