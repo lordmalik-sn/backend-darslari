@@ -11,7 +11,7 @@ from aiohttp import web
 
 # ---------------------------------------------------
 # TOKENINGIZNI SHU YERGA QO'YING
-API_TOKEN = 'TOKEN_BU_YERGA'
+API_TOKEN = '8390998199:AAHnym6ikj7oLn2jICxIC4y2wjgnb-04HOc'
 # ---------------------------------------------------
 
 logging.basicConfig(level=logging.INFO)
