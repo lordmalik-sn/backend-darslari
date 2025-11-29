@@ -10,7 +10,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiohttp import web
 
 # ---------------------------------------------------
-API_TOKEN = 'T8390998199:AAHnym6ikj7oLn2jICxIC4y2wjgnb-04HOc'
+API_TOKEN = '8390998199:AAHnym6ikj7oLn2jICxIC4y2wjgnb-04HOc'
 # ---------------------------------------------------
 
 logging.basicConfig(level=logging.INFO)
