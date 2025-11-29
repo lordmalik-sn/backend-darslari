@@ -112,8 +112,10 @@ async def process_user_guess(message: types.Message):
         return
 
     if games[user_id]['holat'] == 'bot_topadi':
-        await message.answer("Hozir men topyapman, tugmalarni bosing!", reply_markup=javob_kb)
-        return
+    # agar tugmalar bosilgan bo'lsa, yuqorida allaqachon qaytdi
+    await message.answer("Hozir men topyapman, tugmalarni bosing!", reply_markup=javob_kb)
+    return
+
 
     if not message.text.isdigit():
         await message.answer("Faqat raqam yozing!")
