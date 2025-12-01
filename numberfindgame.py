@@ -8,6 +8,13 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiohttp import web
+from background import keep_alive # 1. Buni import qilasiz
+import telebot # va boshqa kodlaringiz...
+
+# ... bot kodlari ...
+
+keep_alive() # 2. Botni ishga tushirishdan (polling) oldin buni chaqirasiz
+bot.infinity_polling()
 
 # ---------------------------------------------------
 # TOKENINGIZNI SHU YERGA QO'YING
